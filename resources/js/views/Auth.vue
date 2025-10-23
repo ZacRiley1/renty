@@ -1,11 +1,15 @@
 <template>
-  <div class="max-w-md mx-auto bg-white rounded-lg border border-zinc-200 shadow-sm p-6">
+  <div class="mx-auto max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-lg">
     <header class="mb-6 text-center space-y-2">
-      <h1 class="text-2xl font-semibold text-zinc-800">
+      <h1 class="text-2xl font-semibold text-brand-dark">
         {{ isRegistering ? 'Create an account' : 'Welcome back' }}
       </h1>
-      <p class="text-sm text-zinc-500">
-        {{ isRegistering ? 'Register to start building your credit.' : 'Sign in to continue to your dashboard.' }}
+      <p class="text-sm text-zinc-600">
+        {{
+          isRegistering
+            ? 'Register to start building your credit.'
+            : 'Sign in to continue to your dashboard.'
+        }}
       </p>
     </header>
 
@@ -17,7 +21,7 @@
           v-model="form.name"
           type="text"
           autocomplete="name"
-          class="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+          class="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-brand-mint focus:outline-none focus:ring-brand-mint/40"
         />
         <p v-if="errors.name" class="text-xs text-red-600">{{ errors.name }}</p>
       </div>
@@ -29,7 +33,7 @@
           v-model="form.email"
           type="email"
           autocomplete="email"
-          class="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+          class="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-brand-mint focus:outline-none focus:ring-brand-mint/40"
         />
         <p v-if="errors.email" class="text-xs text-red-600">{{ errors.email }}</p>
       </div>
@@ -41,21 +45,25 @@
           v-model="form.password"
           type="password"
           autocomplete="current-password"
-          class="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+          class="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-brand-mint focus:outline-none focus:ring-brand-mint/40"
         />
         <p v-if="errors.password" class="text-xs text-red-600">{{ errors.password }}</p>
       </div>
 
       <div v-if="isRegistering" class="space-y-2">
-        <label class="block text-sm font-medium text-zinc-700" for="password_confirmation">Confirm password</label>
+        <label class="block text-sm font-medium text-zinc-700" for="password_confirmation"
+          >Confirm password</label
+        >
         <input
           id="password_confirmation"
           v-model="form.password_confirmation"
           type="password"
           autocomplete="new-password"
-          class="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+          class="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-brand-mint focus:outline-none focus:ring-brand-mint/40"
         />
-        <p v-if="errors.password_confirmation" class="text-xs text-red-600">{{ errors.password_confirmation }}</p>
+        <p v-if="errors.password_confirmation" class="text-xs text-red-600">
+          {{ errors.password_confirmation }}
+        </p>
       </div>
 
       <div v-if="!isRegistering" class="flex items-center justify-between text-sm">
@@ -63,7 +71,7 @@
           <input
             v-model="form.remember"
             type="checkbox"
-            class="rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500"
+            class="rounded border-zinc-300 text-brand-mint focus:ring-brand-mint/40"
           />
           <span class="text-zinc-600">Remember me</span>
         </label>
@@ -75,7 +83,7 @@
 
       <button
         type="submit"
-        class="w-full rounded-md bg-emerald-600 py-2 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:bg-emerald-300"
+        class="w-full rounded-md bg-brand-mint py-2 text-sm font-semibold text-brand-dark transition hover:bg-brand-mint-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary disabled:cursor-not-allowed disabled:bg-brand-mint/60 disabled:text-brand-dark/70"
         :disabled="submitting"
       >
         {{ submitting ? 'Please wait…' : isRegistering ? 'Create account' : 'Sign in' }}
@@ -83,7 +91,11 @@
     </form>
 
     <footer class="mt-6 text-center text-sm text-zinc-600">
-      <button class="font-medium text-emerald-600 hover:text-emerald-500" type="button" @click="toggleMode">
+      <button
+        class="font-medium text-brand-primary hover:text-brand-dark"
+        type="button"
+        @click="toggleMode"
+      >
         {{ isRegistering ? 'Already have an account? Sign in' : 'Need an account? Sign up' }}
       </button>
     </footer>
@@ -94,6 +106,10 @@
 import { computed, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuth } from '../stores/auth';
+
+defineOptions({
+  name: 'AuthView',
+});
 
 const auth = useAuth();
 const router = useRouter();
