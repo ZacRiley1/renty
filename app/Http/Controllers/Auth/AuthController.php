@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\UserPaymentStat;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,11 +26,15 @@ class AuthController extends Controller
             'password' => $validated['password'],
         ]);
 
+        UserPaymentStat::create([
+            'user_id' => $user->id,
+        ]);
+
         Auth::login($user);
         $request->session()->regenerate();
 
         return response()->json([
-            'user' => $user,
+            'user' => $user->load('paymentStats'),
         ], 201);
     }
 
@@ -53,7 +58,7 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         return response()->json([
-            'user' => $request->user(),
+            'user' => $request->user()->load('paymentStats'),
         ]);
     }
 
@@ -70,7 +75,7 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         return response()->json([
-            'user' => $request->user(),
+            'user' => $request->user()->load('paymentStats'),
         ]);
     }
 }

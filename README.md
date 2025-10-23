@@ -1,61 +1,66 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Renty
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Modern Laravel 12 + Vue 3 starter that tracks tenant rent payments, verification reports, and credit score progress. The backend exposes Sanctum-secured APIs with dedicated service, event, and facade layers; the frontend uses Vite and Tailwind for the dashboard experience.
 
-## About Laravel
+## Requirements
+- PHP 8.2+ with required extensions (`pdo`, `mbstring`, `openssl`, `curl`, `json`)
+- Composer 2
+- Node.js 18+ and npm 9+
+- A database connection (MySQL/MariaDB or SQLite are supported out of the box)
+- npm-compatible package manager for the frontend (npm is assumed below)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Local Development
+1. **Clone & install dependencies**
+   ```bash
+   git clone <repo-url>
+   cd renty
+   composer install
+   npm install
+   ```
+2. **Configure the environment**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+   Update database credentials or set `DB_CONNECTION=sqlite` and create `database/database.sqlite`.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+3. **Run database migrations**
+   ```bash
+   php artisan migrate
+   ```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+4. **Start the application**
+   ```bash
+   # Terminal 1 – backend
+   php artisan serve
 
-## Learning Laravel
+   # Terminal 2 – frontend/Vite dev server
+   npm run dev
+   ```
+   Visit `http://127.0.0.1:8000` (Laravel) and Vite will proxy the SPA assets.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Available Scripts
+- `php artisan migrate:fresh --seed` – rebuild the database from scratch.
+- `php artisan test` – run the backend test suite.
+- `npm run dev` – start the Vite development server with HMR.
+- `npm run build` – generate production assets.
+- `npm run lint` / `npm run lint:fix` – ESLint with Vue + Prettier integration.
+- `npm run format` / `npm run format:write` – enforce Prettier formatting.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## API Highlights
+- All API responses use the `Response::api()` macro, returning `{ data, meta.served_at }`.
+- Rent payment flows live behind the `RentPayments` facade (`app/Facades/RentPayments.php`) which delegates to `RentPaymentService`.
+  - `POST /api/rent-payments` records a payment and increments on-time totals.
+  - `POST /api/rent-payments/{rentPayment}/verify` finalises reporting, emits domain events, and updates stats.
+  - `GET /api/dashboard` and `GET /api/rent-payments` share the same payload shape used by the Vue dashboard.
+- `RentPaymentCreated` and `RentPaymentVerified` events trigger listeners for logging and future integrations.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Project Structure Notes
+- `app/Services` contains service classes for rent payments and payment stats, centralising transactional logic.
+- `app/Events` & `app/Listeners` provide extension points for audit trails, notifications, or async processing.
+- `resources/js/views/Dashboard.vue` showcases how the SPA consumes the API and manages verification states.
 
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Next Steps
+- Configure queue workers or schedulers if you add asynchronous event listeners.
+- Extend documentation/API specs using the details above as a starting point.
+- Consider Docker or Sail definitions if you need reproducible infrastructure.
