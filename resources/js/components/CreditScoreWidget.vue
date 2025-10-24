@@ -1,5 +1,7 @@
 <template>
-  <section class="h-full rounded-2xl bg-brand-dark text-white shadow-lg ring-1 ring-white/10">
+  <section
+    class="inline-block max-w-full sm:max-w-lg lg:max-w-xl lg:mx-auto rounded-2xl bg-brand-dark text-white shadow-lg ring-1 ring-white/10"
+  >
     <div class="flex items-start justify-between gap-4 border-b border-white/10 px-6 py-5">
       <div>
         <p class="text-xs font-medium uppercase tracking-[0.2em] text-white/60">
@@ -34,21 +36,27 @@
         <span class="font-semibold text-brand-accent">{{ scoreDelta }}</span>
         points since joining Renty.
       </p>
+      <p v-if="estimatedIncrease > 0" class="mt-2 text-xs text-brand-accent/80">
+        Estimated once your scheduled or submitted payments are reported—stay on pace and you could
+        gain
+        <span class="font-semibold text-brand-accent">+{{ estimatedIncrease }}</span>
+        points this period.
+      </p>
 
       <dl class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div class="rounded-xl bg-white/5 p-4">
-          <dt class="text-xs uppercase tracking-[0.2em] text-white/60">On-time payments</dt>
-          <dd class="mt-2 text-xl font-semibold text-white">
+          <dt class="text-[10px] uppercase tracking-[0.22em] text-white/60">On-time payments</dt>
+          <dd class="mt-1 text-lg font-semibold text-white">
             {{ stats.onTimePayments }}
           </dd>
         </div>
         <div class="rounded-xl bg-white/5 p-4">
-          <dt class="text-xs uppercase tracking-[0.2em] text-white/60">Active streak</dt>
-          <dd class="mt-2 text-xl font-semibold text-white">{{ stats.paymentStreak }} mo</dd>
+          <dt class="text-[10px] uppercase tracking-[0.22em] text-white/60">Active streak</dt>
+          <dd class="mt-1 text-lg font-semibold text-white">{{ stats.paymentStreak }} mo</dd>
         </div>
         <div class="rounded-xl bg-white/5 p-4">
-          <dt class="text-xs uppercase tracking-[0.2em] text-white/60">Reports sent</dt>
-          <dd class="mt-2 text-xl font-semibold text-white">
+          <dt class="text-[10px] uppercase tracking-[0.22em] text-white/60">Reports sent</dt>
+          <dd class="mt-1 text-lg font-semibold text-white">
             {{ stats.reportsSent }}
           </dd>
         </div>
@@ -77,10 +85,21 @@ const props = defineProps({
       reportsSent: '1',
     }),
   },
+  estimate: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const score = computed(() => props.score);
 const stats = computed(() => props.stats);
+const estimatedIncrease = computed(() => {
+  const value = Number(props.estimate ?? 0);
+  if (Number.isNaN(value) || value <= 0) {
+    return 0;
+  }
+  return Math.round(value);
+});
 
 const scoreDelta = computed(() => score.value.current - score.value.start);
 const progress = computed(() => {
