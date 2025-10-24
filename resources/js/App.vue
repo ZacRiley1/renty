@@ -1,5 +1,12 @@
 <template>
-  <div :class="['min-h-screen', isHome ? 'bg-brand-dark text-white' : 'bg-white text-brand-dark']">
+  <div
+    :class="[
+      'flex flex-col min-h-screen',
+      isHome
+        ? 'bg-brand-dark text-white'
+        : 'h-screen bg-white text-brand-dark overflow-hidden',
+    ]"
+  >
     <header
       :class="
         isHome
@@ -60,9 +67,16 @@
       </nav>
     </header>
 
-    <div class="p-6 lg:p-8">
-      <main class="mx-auto max-w-[66vw]">
-        <router-view />
+    <div class="flex-1 min-h-0 overflow-hidden p-6 lg:p-8">
+      <main
+        :class="[
+          'mx-auto flex h-full min-h-0 w-full flex-col overflow-hidden',
+          isHome ? 'max-w-[66vw]' : 'max-w-6xl',
+        ]"
+      >
+        <router-view v-slot="{ Component }">
+          <component :is="Component" class="flex-1 min-h-0" />
+        </router-view>
       </main>
     </div>
   </div>

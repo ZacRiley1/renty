@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
     Route::get('rent-payments', [RentPaymentController::class, 'index']);
     Route::post('rent-payments', [RentPaymentController::class, 'store']);
+    Route::post('rent-payments/advance-late', [RentPaymentController::class, 'advanceLate']);
     Route::post('rent-payments/advance', [RentPaymentController::class, 'advance']);
     Route::post('rent-payments/{rentPayment}/verify', [RentPaymentController::class, 'verify'])
         ->whereNumber('rentPayment');

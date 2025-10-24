@@ -7,6 +7,7 @@ use App\Services\RentPaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Validation\ValidationException;
 
 class RentPaymentController extends Controller
 {
@@ -24,12 +25,20 @@ class RentPaymentController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'paid_on' => ['required', 'date', 'after_or_equal:period_start', 'before_or_equal:period_end'],
+            'paid_on' => ['nullable', 'date'],
             'amount' => ['required', 'numeric', 'min:0'],
             'period_start' => ['required', 'date', 'before_or_equal:period_end'],
             'period_end' => ['required', 'date'],
             'notes' => ['nullable', 'string', 'max:2000'],
+            'schedule_type' => ['required', 'in:specific_day,last_day,last_weekday'],
+            'due_day' => ['nullable', 'integer', 'between:1,31'],
         ]);
+
+        if ($validated['schedule_type'] === 'specific_day' && empty($validated['due_day'])) {
+            throw ValidationException::withMessages([
+                'due_day' => 'Select the day your rent falls due each month.',
+            ]);
+        }
 
         $result = $this->rentPayments->create($request->user(), $validated);
 
@@ -46,6 +55,17 @@ class RentPaymentController extends Controller
     public function advance(Request $request): JsonResponse
     {
         $result = $this->rentPayments->advance($request->user());
+
+        return Response::api($result);
+    }
+
+    public function advanceLate(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'paid_on' => ['nullable', 'date'],
+        ]);
+
+        $result = $this->rentPayments->advanceLate($request->user(), $validated['paid_on'] ?? null);
 
         return Response::api($result);
     }
